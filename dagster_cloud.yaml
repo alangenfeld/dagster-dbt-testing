@@ -1,0 +1,6 @@
+locations:
+- build:
+    directory: ./dagster_dbt_testing
+  code_source:
+    module_name: dagster_dbt_testing.definitions
+  location_name: dagster_dbt_testing
