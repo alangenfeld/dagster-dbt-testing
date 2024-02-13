@@ -10,15 +10,15 @@ setup(
         ],
     },
     install_requires=[
-        "dagster",
-        "dagster-cloud",
-        "dagster-dbt",
+        "dagster @ git+https://github.com/dagster-io/dagster.git@al/04-10-ci_testing#subdirectory=python_modules/dagster",
+        "dagster-dbt @ git+https://github.com/dagster-io/dagster.git@al/04-10-ci_testing#subdirectory=python_modules/libraries/dagster-dbt",
+        "dagster-cloud @ git+https://github.com/dagster-io/dagster-cloud.git@al/04-10-ci-test#subdirectory=dagster-cloud",
+        "dagster-cloud-cli @ git+https://github.com/dagster-io/dagster-cloud.git@al/04-10-ci-test#subdirectory=dagster-cloud-cli",
         "dbt-duckdb",
     ],
     extras_require={
         "dev": [
             "dagster-webserver",
-        ]
+        ],
     },
 )
-
