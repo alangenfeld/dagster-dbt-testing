@@ -13,6 +13,7 @@ env:
   ENABLE_FAST_DEPLOYS: 'true'
   PYTHON_VERSION: '3.8'
   DAGSTER_CLOUD_FILE: 'dagster_cloud.yaml'
+  DAGSTER_CLOUD_IS_BRANCH_DEPLOYMENT: "1"
 
 jobs:
   dagster_cloud_default_deploy:
@@ -40,22 +41,17 @@ jobs:
           ref: ${{ github.head_ref }}
           path: project-repo
 
-      - name: Parse dbt project and package with Dagster project
+      - name: Prepare Artifacts
         if: steps.prerun.outputs.result == 'pex-deploy'
         run: |
           pip install pip --upgrade
-          cd ${{ env.DBT_PROJECT_DIR }}/${{ env.DAGSTER_PROJECT_NAME }}
-          pip install . MarkupSafe==2.0.1 'click>8.1.0' 'Jinja2>3.0.0'
-          pip install pyOpenSSL --upgrade
-          cd -
-          rsync -avz --exclude ${{ env.DAGSTER_PROJECT_NAME }} --exclude .git ${{ env.DBT_PROJECT_DIR }}/ ${{ env.DBT_PACKAGE_DATA_DIR }}
-          dbt deps --project-dir ${{ env.DBT_PACKAGE_DATA_DIR }} --profiles-dir ${{ env.DBT_PACKAGE_DATA_DIR }}
-          dbt parse --project-dir ${{ env.DBT_PACKAGE_DATA_DIR }} --profiles-dir ${{ env.DBT_PACKAGE_DATA_DIR }}
-          rm ${{ env.DBT_PACKAGE_DATA_DIR }}/target/partial_parse.msgpack
+          cd ${{ env.ROOT_DIR }}/${{ env.DAGSTER_PROJECT_NAME }}
+          pip install . --upgrade --upgrade-strategy eager
+          python ${{ env.DAGSTER_PROJECT_NAME }}/artifacts.py
         shell: bash
         env:
           DAGSTER_PROJECT_NAME: "dagster_dbt_testing"
-          DBT_PROJECT_DIR: "$GITHUB_WORKSPACE/project-repo"
+          ROOT_DIR: "$GITHUB_WORKSPACE/project-repo"
           DBT_PACKAGE_DATA_DIR: "$GITHUB_WORKSPACE/project-repo/$DAGSTER_PROJECT_NAME/dbt-project"
 
       - name: Python Executable Deploy
